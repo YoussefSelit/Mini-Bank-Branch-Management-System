@@ -4,6 +4,7 @@ using BankBranchManagementSystem.Enums;
 using BankBranchManagementSystem.Interfaces;
 using BankBranchManagementSystem.Models;
 using BankBranchManagementSystem.Validators;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace BankBranchManagementSystem.Services
 {
@@ -86,12 +87,14 @@ namespace BankBranchManagementSystem.Services
             await employeeRepository.AddAsync(employee);
             await employeeRepository.SaveChangesAsync();
 
-            await auditLogService.LogAsync(
-                userId,
-                "Create",
-                "Employee",
-                employee.EmployeeId,
-                employee.EmployeeBranchId);
+            await auditLogService.LogAsync(new CreateAuditLogDto
+            {
+                UserId = userId,
+                Action = "Create",
+                EntityName = "Employee",
+                EmployeeId = employee.EmployeeId,
+                BranchId = employee.EmployeeBranchId
+            });
         }
 
         //public async Task DeleteEmployeeAsync(int currentUserId, int employeeId, int? newManagerId)
@@ -202,12 +205,14 @@ namespace BankBranchManagementSystem.Services
             employeeRepository.Delete(employee);
             await employeeRepository.SaveChangesAsync();
 
-            await auditLogService.LogAsync(
-                currentUserId,
-                "Delete",
-                "Employee",
-                deletedEmployeeId,
-                deletedBranchId);
+            await auditLogService.LogAsync(new CreateAuditLogDto
+            {
+                UserId = currentUserId,
+                Action = "Delete",
+                EntityName = "Employee",
+                EmployeeId = employee.EmployeeId,
+                BranchId = employee.EmployeeBranchId
+            });
         }
         public async Task TransferEmployeeAsync(int employeeId, int newBranchId, int userId)
         {
@@ -238,12 +243,14 @@ namespace BankBranchManagementSystem.Services
             employeeRepository.Update(employee);
             await employeeRepository.SaveChangesAsync();
 
-            await auditLogService.LogAsync(
-                userId,
-                "Transfer",
-                "Employee",
-                employee.EmployeeId,
-                newBranchId);
+            await auditLogService.LogAsync(new CreateAuditLogDto
+            {
+                UserId = userId,
+                Action = "Transfer",
+                EntityName = "Employee",
+                EmployeeId = employee.EmployeeId,
+                BranchId = employee.EmployeeBranchId
+            });
         }
 
         public async Task<IEnumerable<EmployeeListDto>> SearchEmployeesAsync(string? searchTerm)
@@ -590,12 +597,14 @@ namespace BankBranchManagementSystem.Services
 
             await employeeRepository.SaveChangesAsync();
 
-            await auditLogService.LogAsync(
-                userId,
-                "Edit",
-                "Employee",
-                employee.EmployeeId,
-                employee.EmployeeBranchId);
+            await auditLogService.LogAsync(new CreateAuditLogDto
+            {
+                UserId = userId,
+                Action = "Edit",
+                EntityName = "Employee",
+                EmployeeId = employee.EmployeeId,
+                BranchId = employee.EmployeeBranchId
+            });
         }
 
         // ... rest unchanged

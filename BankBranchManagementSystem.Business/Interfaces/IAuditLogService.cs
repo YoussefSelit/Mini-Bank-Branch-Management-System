@@ -1,13 +1,8 @@
-﻿using BankBranchManagementSystem.Models;
+﻿using BankBranchManagementSystem.Dtos;
 
 public interface IAuditLogService
 {
-    Task LogAsync(
-    int? userId,
-    string action,
-    string entityName,
-    int? employeeId = null,
-    int? branchId = null);
+    Task LogAsync(CreateAuditLogDto log);
 
-    Task<List<AuditLog>> GetAllAsync();
+    Task<List<AuditLogDto>> GetAllAsync();
 }
