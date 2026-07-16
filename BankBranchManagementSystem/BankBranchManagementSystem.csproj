@@ -24,10 +24,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="wwwroot\images\" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <ProjectReference Include="..\BankBranchManagementSystem.Business\BankBranchManagementSystem.Business.csproj" />
 	  <ProjectReference Include="..\BankBranchManagementSystem.Dtos\BankBranchManagementSystem.Dtos.csproj" />
 	  <ProjectReference Include="..\BankBranchManagementSystem.ViewModels\BankBranchManagementSystem.ViewModels.csproj" />

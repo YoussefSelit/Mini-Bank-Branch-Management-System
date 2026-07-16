@@ -37,10 +37,11 @@ namespace BankBranchManagementSystem.Controllers
             return View(employee);
         }
 
-        // GET: /Employee/ViewModal/5  (fragment used by the Bootstrap modal on EmployeeManagement)
+        // GET: /Employee/ViewModal/5
         public async Task<IActionResult> ViewModal(int id)
         {
             var employee = await _employeeService.GetEmployeeDetailsAsync(id);
+
             if (employee == null)
                 return NotFound();
 
