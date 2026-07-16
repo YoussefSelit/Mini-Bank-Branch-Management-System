@@ -1,46 +1,110 @@
-﻿<style>
-    .view-branch-link {
-        transition: .2s;
+﻿@model BankBranchManagementSystem.Dtos.EmployeeDetailsDto
+
+<div class="view-employee-container p-3">
+
+    <h5 class="mb-3">EMPLOYEE DETAILS</h5>
+
+    <div class="d-flex justify-content-between border-bottom py-2">
+        <span class="fw-semibold">Name</span>
+        <span>
+            @Model.EmployeeFirstName @Model.EmployeeLastName
+        </span>
+    </div>
+
+    <div class="d-flex justify-content-between border-bottom py-2">
+        <span class="fw-semibold">Job Title</span>
+        <span>
+            @(Model.EmployeeJobTitle ?? "-")
+        </span>
+    </div>
+
+    <div class="d-flex justify-content-between border-bottom py-2">
+        <span class="fw-semibold">Branch</span>
+        <span>
+            @(Model.EmployeeBranchName ?? "-")
+        </span>
+    </div>
+
+    <div class="d-flex justify-content-between border-bottom py-2">
+        <span class="fw-semibold">Phone</span>
+        <span>
+            @(Model.EmployeePhone ?? "-")
+        </span>
+    </div>
+
+    <div class="d-flex justify-content-between border-bottom py-2">
+        <span class="fw-semibold">Email</span>
+        <span>
+            @(Model.EmployeeEmail ?? "-")
+        </span>
+    </div>
+
+    <div class="d-flex justify-content-between border-bottom py-2">
+        <span class="fw-semibold">Hire Date</span>
+        <span>
+            @(Model.EmployeeHireDate?.ToString("yyyy-MM-dd") ?? "-")
+        </span>
+    </div>
+
+    <div class="d-flex justify-content-between py-2">
+        <span class="fw-semibold">Status</span>
+        <span>
+            <span class="badge @(Model.EmploymentStatus == "Active" ? "bg-success" : "bg-secondary")">
+                @(Model.EmploymentStatus ?? "-")
+            </span>
+        </span>
+    </div>
+
+
+    @if (Model.LinkedUsernames != null && Model.LinkedUsernames.Any())
+    {
+        <div class="accordion mt-3" id="employeeUsersAccordion">
+
+            <div class="accordion-item">
+
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#employeeUsersCollapse">
+                        Linked User Accounts (@Model.LinkedUsernames.Count)
+                    </button>
+                </h2>
+
+
+                <div id="employeeUsersCollapse"
+                     class="accordion-collapse collapse"
+                     data-bs-parent="#employeeUsersAccordion">
+
+                    <div class="accordion-body p-0">
+
+                        <ul class="list-group list-group-flush">
+                            @foreach (var username in Model.LinkedUsernames)
+                            {
+                                <li class="list-group-item">
+                                    @username
+                                </li>
+                            }
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
     }
 
-        .view-branch-link:hover {
-            color: #dc3545 !important;
-        }
-</style>
 
-@section Scripts {
-    <script>
-        (function () {
-            var modalEl = document.getElementById('viewBranchModal');
-            var modalBody = document.getElementById('viewBranchModalBody');
-            var modal = new bootstrap.Modal(modalEl);
+    <div class="text-center mt-3">
 
-            document.querySelectorAll('.view-branch-link').forEach(function (link) {
-                link.addEventListener('click', function (e) {
-                    e.preventDefault();
+        <button type="button"
+                class="btn btn-danger"
+                data-bs-dismiss="modal">
+            CLOSE
+        </button>
 
-                    var branchId = this.getAttribute('data-branch-id');
+    </div>
 
-                    modalBody.innerHTML =
-                        '<div class="text-center py-4"><div class="spinner-border text-dark"></div></div>';
-
-                    modal.show();
-
-                    fetch('/Branch/ViewModal/' + branchId)
-                        .then(function (response) {
-                            if (!response.ok) throw new Error();
-
-                            return response.text();
-                        })
-                        .then(function (html) {
-                            modalBody.innerHTML = html;
-                        })
-                        .catch(function () {
-                            modalBody.innerHTML =
-                                '<div class="alert alert-danger">Could not load branch details.</div>';
-                        });
-                });
-            });
-        })();
-    </script>
-}
+</div>

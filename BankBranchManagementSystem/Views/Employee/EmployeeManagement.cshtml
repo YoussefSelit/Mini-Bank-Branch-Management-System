@@ -174,10 +174,10 @@
 </div>
 
 <!-- View Employee modal -->
-<div class="modal fade" id="viewBranchModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="viewEmployeeModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-body" id="viewBranchModalBody">
+            <div class="modal-body" id="viewEmployeeModalBody">
                 <div class="text-center py-4">
                     <div class="spinner-border text-dark" role="status"></div>
                 </div>
@@ -186,48 +186,71 @@
     </div>
 </div>
 
-
-
 @section Scripts {
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
 
-            const modal = new bootstrap.Modal(document.getElementById("viewBranchModal"));
-            const modalBody = document.getElementById("viewBranchModalBody");
+        console.log("Employee script loaded");
 
-            document.querySelectorAll(".view-branch-link").forEach(function (link) {
 
-                link.addEventListener("click", function (e) {
+        (function () {
+
+            var modalEl = document.getElementById('viewEmployeeModal');
+            var modalBody = document.getElementById('viewEmployeeModalBody');
+
+            var modal = new bootstrap.Modal(modalEl);
+
+
+            document.querySelectorAll('.view-employee-link').forEach(function (link) {
+
+                link.addEventListener('click', function (e) {
 
                     e.preventDefault();
 
-                    const branchId = this.dataset.branchId;
+
+                    var employeeId = this.getAttribute('data-employee-id');
+
+
+                    console.log("Employee ID:", employeeId);
+
 
                     modalBody.innerHTML =
-                        '<div class="text-center py-4"><div class="spinner-border text-dark" role="status"></div></div>';
+                        '<div class="text-center py-4"><div class="spinner-border text-dark"></div></div>';
 
-                    fetch("/Branch/ViewModal/" + branchId)
-                        .then(function (response) {
-                            if (!response.ok)
-                                throw new Error("Failed to load branch details");
+
+                    modal.show();
+
+
+                    fetch('/Employee/ViewModal/' + employeeId)
+
+                        .then(function(response) {
+
+                            if (!response.ok) {
+                                throw new Error();
+                            }
 
                             return response.text();
-                        })
-                        .then(function (html) {
-                            modalBody.innerHTML = html;
-                            modal.show();
-                        })
-                        .catch(function () {
-                            modalBody.innerHTML =
-                                '<div class="alert alert-danger m-3">Could not load branch details.</div>';
 
-                            modal.show();
+                        })
+
+                        .then(function(html) {
+
+                            modalBody.innerHTML = html;
+
+                        })
+
+                        .catch(function() {
+
+                            modalBody.innerHTML =
+                            '<div class="alert alert-danger">Could not load employee details.</div>';
+
                         });
 
                 });
 
             });
 
-        });
+
+        })();
+
     </script>
 }
