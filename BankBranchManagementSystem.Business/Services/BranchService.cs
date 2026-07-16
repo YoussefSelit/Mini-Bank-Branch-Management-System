@@ -4,6 +4,7 @@ using BankBranchManagementSystem.Enums;
 using BankBranchManagementSystem.Interfaces;
 using BankBranchManagementSystem.Models;
 using BankBranchManagementSystem.Validators;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.EntityFrameworkCore;
 
 namespace BankBranchManagementSystem.Services
@@ -80,12 +81,13 @@ namespace BankBranchManagementSystem.Services
             await userService.CreateBranchManagerAccountAsync(employee);
             await employeeRepository.SaveChangesAsync();
 
-            await auditLogService.LogAsync(
-                userId,
-                "Create",
-                "Branch",
-                null,
-                branch.BranchId);
+            await auditLogService.LogAsync(new CreateAuditLogDto
+            {
+                UserId = userId,
+                Action = "Create",
+                EntityName = "Branch",
+                BranchId = branch.BranchId
+            });
         }
 
         public async Task UpdateBranchAsync(Branch branch, string? oldManagerNewJobTitle, int userId)
@@ -173,12 +175,13 @@ namespace BankBranchManagementSystem.Services
 
             await branchRepository.SaveChangesAsync();
 
-            await auditLogService.LogAsync(
-                userId,
-                "Edit",
-                "Branch",
-                null,
-                branch.BranchId);
+            await auditLogService.LogAsync(new CreateAuditLogDto
+            {
+                UserId = userId,
+                Action = "Edit",
+                EntityName = "Branch",
+                BranchId = branch.BranchId
+            });
         }
 
         public async Task DeleteBranchAsync(int id, int userId)
@@ -193,12 +196,13 @@ namespace BankBranchManagementSystem.Services
 
             branchRepository.Delete(branch);
             await branchRepository.SaveChangesAsync();
-            await auditLogService.LogAsync(
-                userId,
-                "Delete",
-                "Branch",
-                null,
-                branch.BranchId);
+            await auditLogService.LogAsync(new CreateAuditLogDto
+            {
+                UserId = userId,
+                Action = "Delete",
+                EntityName = "Branch",
+                BranchId = branch.BranchId
+            });
         }
 
         public async Task UpdateBranchStatusAsync(int id, bool isActive, int userID)
@@ -215,12 +219,13 @@ namespace BankBranchManagementSystem.Services
             branchRepository.Update(branch);
             await branchRepository.SaveChangesAsync();
 
-            await auditLogService.LogAsync(
-                userID,
-                branch.BranchStatus == BranchStatus.Active.ToString() ? "Activate" : "Deactivate",
-                "Branch",
-                null,
-                branch.BranchId);
+            await auditLogService.LogAsync(new CreateAuditLogDto
+            {
+                UserId = userID,
+                Action = isActive ? "Activate" : "Deactivate",
+                EntityName = "Branch",
+                BranchId = branch.BranchId
+            });
         }
 
         public async Task<BranchDetailsDto?> GetBranchDetailsAsync(int id)

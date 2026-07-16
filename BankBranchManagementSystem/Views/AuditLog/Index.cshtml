@@ -1,4 +1,4 @@
-@model IEnumerable<BankBranchManagementSystem.Models.AuditLog>
+@model IEnumerable<BankBranchManagementSystem.Dtos.AuditLogDto>
 
 @{
     ViewData["Title"] = "Audit Logs";
@@ -14,8 +14,8 @@
                 <th>User</th>
                 <th>Action</th>
                 <th>Entity</th>
-                <th>Employee ID</th>
-                <th>Branch ID</th>
+                <th>Employee</th>
+                <th>Branch</th>
             </tr>
         </thead>
 
@@ -25,11 +25,11 @@
         {
             <tr>
                 <td>@log.ActionDate</td>
-                <td>@($"{log.User?.UserFirstName} {log.User?.UserLastName}")</td>
+                <td>@(log.UserUsername ?? "System")</td>
                 <td>@log.Action</td>
                 <td>@log.EntityName</td>
-                <td>@(log.EmployeeId?.ToString() ?? "-")</td>
-                <td>@(log.BranchId?.ToString() ?? "-")</td>
+                <td>@(log.EmployeeFullName ?? (log.EmployeeId.HasValue ? $"#{log.EmployeeId}" : "-"))</td>
+                <td>@(log.BranchName ?? (log.BranchId.HasValue ? $"#{log.BranchId}" : "-"))</td>
             </tr>
         }
 
