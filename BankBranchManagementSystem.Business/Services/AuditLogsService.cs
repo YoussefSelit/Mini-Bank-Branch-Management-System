@@ -1,4 +1,6 @@
-﻿using BankBranchManagementSystem.Models;
+﻿using BankBranchManagementSystem.Dtos;
+using BankBranchManagementSystem.Interfaces;
+using BankBranchManagementSystem.Models;
 using BankBranchManagementSystem.Repositories;
 
 
@@ -11,29 +13,47 @@ public class AuditLogService : IAuditLogService
         auditLogRepository = repository;
     }
 
-    public async Task LogAsync(
-    int? userId,
-    string action,
-    string entityName,
-    int? employeeId = null,
-    int? branchId = null)
+    public async Task LogAsync(CreateAuditLogDto log)
     {
-        var log = new AuditLog
+        var entity = new AuditLog
         {
-            UserId = userId,
-            Action = action,
-            EntityName = entityName,
-            EmployeeId = employeeId,
-            BranchId = branchId,
+            UserId = log.UserId,
+            Action = log.Action,
+            EntityName = log.EntityName,
+            EmployeeId = log.EmployeeId,
+            BranchId = log.BranchId,
             ActionDate = DateTime.Now
         };
 
-        await auditLogRepository.AddAsync(log);
+        await auditLogRepository.AddAsync(entity);
         await auditLogRepository.SaveChangesAsync();
     }
 
-    public async Task<List<AuditLog>> GetAllAsync()
+    public async Task<List<AuditLogDto>> GetAllAsync()
     {
-        return await auditLogRepository.GetAllAsync();
+        var logs = await auditLogRepository.GetAllAsync();
+        return logs.Select(MapToDto).ToList();
+    }
+
+    private static AuditLogDto MapToDto(AuditLog log)
+    {
+        return new AuditLogDto
+        {
+            LogId = log.LogId,
+            Action = log.Action,
+            EntityName = log.EntityName,
+            ActionDate = log.ActionDate,
+
+            UserId = log.UserId,
+            UserUsername = log.User?.UserUsername,
+
+            EmployeeId = log.EmployeeId,
+            EmployeeFullName = log.Employee != null
+                ? $"{log.Employee.EmployeeFirstName} {log.Employee.EmployeeLastName}"
+                : null,
+
+            BranchId = log.BranchId,
+            BranchName = log.Branch?.BranchName
+        };
     }
 }
