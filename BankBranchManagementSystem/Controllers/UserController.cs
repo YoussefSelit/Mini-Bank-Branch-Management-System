@@ -10,12 +10,12 @@ namespace BankBranchManagementSystem.Controllers
     public class UserController : Controller
     {
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
+        //private readonly IRoleService _roleService;
 
-        public UserController(IUserService userService, IRoleService roleService)
+        public UserController(IUserService userService)
         {
             _userService = userService;
-            _roleService = roleService;
+            //_roleService = roleService;
         }
 
         // ---------- "My Account" — any logged-in user manages their own info ----------
@@ -103,100 +103,100 @@ namespace BankBranchManagementSystem.Controllers
         // ---------- Admin-only user management ----------
 
         // GET: /User/Index
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Index()
-        {
-            var users = await _userService.GetAllUsersAsync();
-            return View(users);
-        }
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> Index()
+        //{
+        //    var users = await _userService.GetAllUsersAsync();
+        //    return View(users);
+        //}
 
         // GET: /User/CreateAccount?employeeId=5
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateAccount(int employeeId)
-        {
-            var model = new CreateUserAccountViewModel { EmployeeId = employeeId };
-            await PopulateRoleDropdownAsync();
-            return View(model);
-        }
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> CreateAccount(int employeeId)
+        //{
+        //    var model = new CreateUserAccountViewModel { EmployeeId = employeeId };
+        //    await PopulateRoleDropdownAsync();
+        //    return View(model);
+        //}
 
         // POST: /User/CreateAccount
-        [HttpPost]
-        [Authorize(Roles = "Admin")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateAccount(CreateUserAccountViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                await PopulateRoleDropdownAsync();
-                return View(model);
-            }
+        //[HttpPost]
+        //[Authorize(Roles = "Admin")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> CreateAccount(CreateUserAccountViewModel model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        await PopulateRoleDropdownAsync();
+        //        return View(model);
+        //    }
 
-            try
-            {
-                await _userService.CreateUserAccountAsync(
-                    GetCurrentUserId(),
-                    model.EmployeeId,
-                    model.Username,
-                    model.InitialPassword,
-                    model.RoleId);
+        //    try
+        //    {
+        //        await _userService.CreateUserAccountAsync(
+        //            GetCurrentUserId(),
+        //            model.EmployeeId,
+        //            model.Username,
+        //            model.InitialPassword,
+        //            model.RoleId);
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                await PopulateRoleDropdownAsync();
-                return View(model);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Forbid();
-            }
-            catch (InvalidOperationException ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                await PopulateRoleDropdownAsync();
-                return View(model);
-            }
-        }
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch (KeyNotFoundException ex)
+        //    {
+        //        ModelState.AddModelError(string.Empty, ex.Message);
+        //        await PopulateRoleDropdownAsync();
+        //        return View(model);
+        //    }
+        //    catch (UnauthorizedAccessException)
+        //    {
+        //        return Forbid();
+        //    }
+        //    catch (InvalidOperationException ex)
+        //    {
+        //        ModelState.AddModelError(string.Empty, ex.Message);
+        //        await PopulateRoleDropdownAsync();
+        //        return View(model);
+        //    }
+        //}
 
         // GET: /User/Delete/5
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var user = await _userService.GetUserAsync(id);
-            if (user == null)
-                return NotFound();
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> Delete(int id)
+        //{
+        //    var user = await _userService.GetUserAsync(id);
+        //    if (user == null)
+        //        return NotFound();
 
-            return View(user);
-        }
+        //    return View(user);
+        //}
 
         // POST: /User/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [Authorize(Roles = "Administrator")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            try
-            {
-                await _userService.DeleteUserAsync(GetCurrentUserId(), id);
-                return RedirectToAction(nameof(Index));
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Forbid();
-            }
-            catch (InvalidOperationException ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                var user = await _userService.GetUserAsync(id);
-                return View("Delete", user);
-            }
-        }
+        //[HttpPost, ActionName("Delete")]
+        //[Authorize(Roles = "Administrator")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(int id)
+        //{
+        //    try
+        //    {
+        //        await _userService.DeleteUserAsync(GetCurrentUserId(), id);
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch (KeyNotFoundException)
+        //    {
+        //        return NotFound();
+        //    }
+        //    catch (UnauthorizedAccessException)
+        //    {
+        //        return Forbid();
+        //    }
+        //    catch (InvalidOperationException ex)
+        //    {
+        //        ModelState.AddModelError(string.Empty, ex.Message);
+        //        var user = await _userService.GetUserAsync(id);
+        //        return View("Delete", user);
+        //    }
+        //}
 
         // ---------- helpers ----------
 
@@ -205,12 +205,12 @@ namespace BankBranchManagementSystem.Controllers
             return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         }
 
-        private async Task PopulateRoleDropdownAsync()
-        {
-            var roles = await _roleService.GetAllRolesAsync();
-            ViewBag.Roles = roles
-                .Select(r => new { r.RoleId, r.RoleName })
-                .ToList();
-        }
+        //private async Task PopulateRoleDropdownAsync()
+        //{
+        //    var roles = await _roleService.GetAllRolesAsync();
+        //    ViewBag.Roles = roles
+        //        .Select(r => new { r.RoleId, r.RoleName })
+        //        .ToList();
+        //}
     }
 }

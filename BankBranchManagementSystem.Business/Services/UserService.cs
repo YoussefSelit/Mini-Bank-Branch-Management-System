@@ -1,4 +1,5 @@
-﻿using BankBranchManagementSystem.Interfaces;
+﻿using BankBranchManagementSystem.Dtos;
+using BankBranchManagementSystem.Interfaces;
 using BankBranchManagementSystem.Models;
 using BankBranchManagementSystem.Repositories;
 using BankBranchManagementSystem.Validators;
@@ -31,15 +32,24 @@ namespace BankBranchManagementSystem.Services
             return user;
         }
 
-        public async Task<User?> GetUserAsync(int id)
+
+        //Edited the GetUserAsync to implement DTOs
+        public async Task<UserDto?> GetUserAsync(int id)
         {
-            return await userRepository.GetByIdAsync(id);
+            var user = await userRepository.GetUserWithRoleAsync(id); // includes UserRole
+            return user == null ? null : MapToDto(user);
         }
 
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
-        {
-            return await userRepository.GetAllAsync();
-        }
+
+        //public async Task<User?> GetUserAsync(int id)
+        //{
+        //    return await userRepository.GetByIdAsync(id);
+        //}
+
+        //public async Task<IEnumerable<User>> GetAllUsersAsync()
+        //{
+        //    return await userRepository.GetAllAsync();
+        //}
 
 
         public async Task ChangePasswordAsync(int userId, string currentPassword, string newPassword)
@@ -104,73 +114,73 @@ namespace BankBranchManagementSystem.Services
             await userRepository.SaveChangesAsync();
         }
 
-        public async Task DeleteUserAsync(int adminId, int userId)
-        {
-            // Get the admin performing the delete
-            var admin = await userRepository.GetUserWithRoleAsync(adminId);
+        //public async Task DeleteUserAsync(int adminId, int userId)
+        //{
+        //    // Get the admin performing the delete
+        //    var admin = await userRepository.GetUserWithRoleAsync(adminId);
 
-            if (admin == null)
-                throw new KeyNotFoundException("Admin not found.");
+        //    if (admin == null)
+        //        throw new KeyNotFoundException("Admin not found.");
 
-            // Make sure the user performing the action is an Admin
-            if (admin.UserRole == null || admin.UserRole.RoleName != "Admin")
-                throw new UnauthorizedAccessException("Only administrators can delete users.");
+        //    // Make sure the user performing the action is an Admin
+        //    if (admin.UserRole == null || admin.UserRole.RoleName != "Admin")
+        //        throw new UnauthorizedAccessException("Only administrators can delete users.");
 
-            // Get the user to delete
-            var user = await userRepository.GetUserWithRoleAsync(userId);
+        //    // Get the user to delete
+        //    var user = await userRepository.GetUserWithRoleAsync(userId);
 
-            if (user == null)
-                throw new KeyNotFoundException("User not found.");
+        //    if (user == null)
+        //        throw new KeyNotFoundException("User not found.");
 
-            // Only Branch Managers can be deleted
-            if (user.UserRole == null || user.UserRole.RoleName != "Branch Manager")
-                throw new InvalidOperationException("Only Branch Managers can be deleted.");
+        //    // Only Branch Managers can be deleted
+        //    if (user.UserRole == null || user.UserRole.RoleName != "Branch Manager")
+        //        throw new InvalidOperationException("Only Branch Managers can be deleted.");
 
-            // Delete the user
-            userRepository.Delete(user);
-            await userRepository.SaveChangesAsync();
-        }
+        //    // Delete the user
+        //    userRepository.Delete(user);
+        //    await userRepository.SaveChangesAsync();
+        //}
 
 
-        public async Task<User> CreateUserAccountAsync(int adminId, int employeeId, string username, string initialPassword, int roleId)
-        {
-            var admin = await userRepository.GetUserWithRoleAsync(adminId);
-            if (admin == null)
-                throw new KeyNotFoundException("Admin not found.");
+        //public async Task<User> CreateUserAccountAsync(int adminId, int employeeId, string username, string initialPassword, int roleId)
+        //{
+        //    var admin = await userRepository.GetUserWithRoleAsync(adminId);
+        //    if (admin == null)
+        //        throw new KeyNotFoundException("Admin not found.");
 
-            if (admin.UserRole == null || admin.UserRole.RoleName != "Admin")
-                throw new UnauthorizedAccessException("Only administrators can create user accounts.");
+        //    if (admin.UserRole == null || admin.UserRole.RoleName != "Admin")
+        //        throw new UnauthorizedAccessException("Only administrators can create user accounts.");
 
-            var employee = await employeeRepository.GetByIdAsync(employeeId);
-            if (employee == null)
-                throw new KeyNotFoundException("Employee not found.");
+        //    var employee = await employeeRepository.GetByIdAsync(employeeId);
+        //    if (employee == null)
+        //        throw new KeyNotFoundException("Employee not found.");
 
-            var existingAccount = await userRepository.GetByEmployeeIdAsync(employeeId);
-            if (existingAccount != null)
-                throw new InvalidOperationException("This employee already has a user account.");
+        //    var existingAccount = await userRepository.GetByEmployeeIdAsync(employeeId);
+        //    if (existingAccount != null)
+        //        throw new InvalidOperationException("This employee already has a user account.");
 
-            if (string.IsNullOrWhiteSpace(username))
-                throw new InvalidOperationException("Username is required.");
+        //    if (string.IsNullOrWhiteSpace(username))
+        //        throw new InvalidOperationException("Username is required.");
 
-            if (await userRepository.UsernameExistsAsync(username))
-                throw new InvalidOperationException("Username already exists.");
+        //    if (await userRepository.UsernameExistsAsync(username))
+        //        throw new InvalidOperationException("Username already exists.");
 
-            var role = await roleRepository.GetByIdAsync(roleId);
-            if(role == null)
-                throw new KeyNotFoundException("Role not found.");
+        //    var role = await roleRepository.GetByIdAsync(roleId);
+        //    if(role == null)
+        //        throw new KeyNotFoundException("Role not found.");
 
-            var newUser = new User
-            {
-                EmployeeId = employeeId,
-                UserUsername = username,
-                UserPassword = initialPassword, 
-                UserRoleId = roleId
-            };
+        //    var newUser = new User
+        //    {
+        //        EmployeeId = employeeId,
+        //        UserUsername = username,
+        //        UserPassword = initialPassword, 
+        //        UserRoleId = roleId
+        //    };
 
-            await userRepository.AddAsync(newUser);
-            await userRepository.SaveChangesAsync();
-            return newUser;
-        }
+        //    await userRepository.AddAsync(newUser);
+        //    await userRepository.SaveChangesAsync();
+        //    return newUser;
+        //}
 
 
 
@@ -208,5 +218,23 @@ namespace BankBranchManagementSystem.Services
 
             await userRepository.AddAsync(user);
         }
+
+        //Adding a private Mapper
+        private static UserDto MapToDto(User u) => new UserDto
+        {
+            UserId = u.UserId,
+            UserFirstName = u.UserFirstName,
+            UserLastName = u.UserLastName,
+            UserUsername = u.UserUsername,
+            UserEmail = u.UserEmail,
+            UserPhoneNumber = u.UserPhoneNumber,
+            UserRoleId = u.UserRoleId,
+            UserRoleName = u.UserRole?.RoleName,
+            EmployeeId = u.EmployeeId,
+            EmployeeFullName = u.Employee != null
+        ? $"{u.Employee.EmployeeFirstName} {u.Employee.EmployeeLastName}"
+        : null
+        };
+
     }
 }
