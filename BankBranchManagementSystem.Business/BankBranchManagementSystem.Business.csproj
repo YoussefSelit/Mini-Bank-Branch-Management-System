@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="libphonenumber-csharp" Version="9.0.34" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BankBranchManagementSystem.Data\BankBranchManagementSystem.Data.csproj" />
+    <ProjectReference Include="..\BankBranchManagementSystem.Dtos\BankBranchManagementSystem.Dtos.csproj" />
+    <ProjectReference Include="..\BankBranchManagementSystem.Models\BankBranchManagementSystem.Models.csproj" />
+  </ItemGroup>
+
+</Project>

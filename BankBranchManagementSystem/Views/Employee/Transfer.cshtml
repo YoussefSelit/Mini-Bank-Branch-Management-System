@@ -1,0 +1,95 @@
+﻿@model BankBranchManagementSystem.ViewModels.TransferEmployeeViewModel
+
+@{
+    ViewData["Title"] = "Transfer Employee";
+    var employee = ViewBag.Employee as BankBranchManagementSystem.Models.Employee;
+}
+
+<div class="d-flex justify-content-center mt-4">
+    <div class="card shadow-sm" style="max-width:550px; width:100%;">
+        <div class="card-header bg-dark text-white">
+            <h3 class="mb-0">Transfer Employee</h3>
+        </div>
+
+        <div class="card-body">
+
+            @if (employee != null)
+            {
+                <div class="alert alert-light border">
+                    Transferring
+                    <strong>@employee.EmployeeFirstName @employee.EmployeeLastName</strong>
+                    <br />
+                    Current Branch:
+                    <strong>@(employee.EmployeeBranch?.BranchName ?? "-")</strong>
+                </div>
+            }
+
+            <form asp-controller="Employee"
+                  asp-action="Transfer"
+                  asp-route-id="@Model.EmployeeId"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="EmployeeId" />
+
+                <div asp-validation-summary="All"
+                     class="text-danger mb-3"></div>
+
+                <div class="mb-4">
+                    <label asp-for="NewBranchId" class="form-label">
+                        New Branch
+                    </label>
+
+                    <select asp-for="NewBranchId"
+                            class="form-select"
+                            required>
+
+                        <option value="" selected disabled>
+                            -- Select a Branch --
+                        </option>
+
+                        @foreach (var branch in (IEnumerable<dynamic>)ViewBag.Branches)
+                        {
+                            <option value="@branch.BranchId"
+                                    disabled="@(!branch.IsActive)">
+
+                                @branch.BranchName
+                                @(!branch.IsActive ? "(Inactive)" : "")
+
+                            </option>
+                        }
+
+                    </select>
+
+                    <span asp-validation-for="NewBranchId"
+                          class="text-danger"></span>
+
+                    <div class="form-text">
+                        Employees can only be transferred to active branches.
+                    </div>
+                </div>
+
+                <div class="text-end">
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-dark">
+                        Cancel
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-danger">
+                        Transfer
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

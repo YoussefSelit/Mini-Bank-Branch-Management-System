@@ -1,0 +1,116 @@
+﻿@model BankBranchManagementSystem.ViewModels.CreateEmployeeViewModel
+
+@{
+    ViewData["Title"] = "Add Employee";
+}
+
+<div class="d-flex justify-content-center mt-4">
+    <div class="card shadow-lg border-0" style="width:100%; max-width:700px; border-radius:15px;">
+
+        <div class="card-header bg-dark text-white text-center py-3">
+            <h2 class="mb-0">Add Employee</h2>
+        </div>
+
+        <div class="card-body p-4">
+
+            <form asp-controller="Employee" asp-action="Create" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <div class="row mb-3">
+
+                    <div class="col">
+                        <label asp-for="EmployeeFirstName" class="form-label fw-semibold"></label>
+                        <input asp-for="EmployeeFirstName" class="form-control" />
+                        <span asp-validation-for="EmployeeFirstName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col">
+                        <label asp-for="EmployeeLastName" class="form-label fw-semibold"></label>
+                        <input asp-for="EmployeeLastName" class="form-control" />
+                        <span asp-validation-for="EmployeeLastName" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EmployeeJobTitle" class="form-label fw-semibold"></label>
+                    <input asp-for="EmployeeJobTitle" class="form-control" />
+                </div>
+
+                <div class="row mb-3">
+
+                    <div class="col">
+                        <label asp-for="EmployeeEmail" class="form-label fw-semibold"></label>
+                        <input asp-for="EmployeeEmail" class="form-control" type="email" />
+                        <span asp-validation-for="EmployeeEmail" class="text-danger"></span>
+                    </div>
+
+                    <div class="col">
+                        <label asp-for="EmployeePhone" class="form-label fw-semibold"></label>
+                        <input asp-for="EmployeePhone" class="form-control" type="tel" />
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EmployeeHireDate" class="form-label fw-semibold"></label>
+                    <input asp-for="EmployeeHireDate"
+                           class="form-control"
+                           type="date"
+                           max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="EmployeeBranchId" class="form-label fw-semibold"></label>
+
+                    <select asp-for="EmployeeBranchId" class="form-select">
+
+                        <option value="">-- Select a Branch --</option>
+
+                        @foreach (var branch in (IEnumerable<dynamic>)ViewBag.Branches)
+                        {
+                            <option value="@branch.BranchId">
+                                @branch.BranchName
+                            </option>
+                        }
+
+                    </select>
+
+                    <span asp-validation-for="EmployeeBranchId" class="text-danger"></span>
+
+                    <div class="form-text">
+                        Only active branches can receive new employees.
+                    </div>
+
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+
+                    <a asp-controller="Employee"
+                       asp-action="Index"
+                       class="btn btn-dark px-4">
+                        Cancel
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-danger px-4">
+                        Add Employee
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

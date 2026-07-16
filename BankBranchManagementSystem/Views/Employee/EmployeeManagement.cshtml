@@ -1,0 +1,233 @@
+﻿@model IEnumerable<BankBranchManagementSystem.Dtos.EmployeeListDto>
+
+@{
+    ViewData["Title"] = "Employee Management";
+
+    bool isAdmin = User.IsInRole("Admin");
+    bool isBranchManagerUser = User.IsInRole("Branch Manager");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">Employee Management</h1>
+
+    <a asp-controller="Employee" asp-action="Create" class="btn btn-danger">
+        + Add Employee
+    </a>
+</div>
+
+<form asp-controller="Employee"
+      asp-action="Search"
+      method="get"
+      class="d-flex mb-4"
+      style="max-width:400px;">
+
+    <input type="text"
+           name="searchTerm"
+           class="form-control me-2"
+           placeholder="Search by name or ID..."
+           value="@Context.Request.Query["searchTerm"]" />
+
+    <button type="submit" class="btn btn-outline-secondary">
+        Search
+    </button>
+</form>
+
+<div class="card shadow-sm">
+    <table class="table table-striped mb-0 align-middle">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Job Title</th>
+                <th>Branch</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">
+                        No employees found.
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var employee in Model)
+                {
+                    bool branchIsActive = employee.EmployeeBranchStatus == "Active";
+                    bool employeeIsBranchManager =
+                        employee.EmployeeBranchManagerId == employee.EmployeeId;
+                    <tr>
+
+                        <td>
+                            <a href="#"
+                               class="view-employee-link text-dark text-decoration-none fw-semibold"
+                               data-employee-id="@employee.EmployeeId">
+                                @employee.EmployeeFirstName @employee.EmployeeLastName
+                            </a>
+                        </td>
+
+                        <td>
+                            @(employee.EmployeeJobTitle ?? "-")
+                        </td>
+
+                        <td>
+                            @(employee.EmployeeBranchName ?? "-")
+                        </td>
+
+                        <td>
+                            <span class="badge @(employee.EmploymentStatus == "Active"
+                                                                  ? "bg-success"
+                                                                  : "bg-secondary")">
+
+                                @(employee.EmploymentStatus ?? "-")
+
+                            </span>
+                        </td>
+
+                        <td class="text-end">
+
+                            @* EDIT *@
+                            @if (employeeIsBranchManager && isBranchManagerUser)
+                            {
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-dark"
+                                        disabled
+                                        title="Branch managers cannot edit another branch manager.">
+                                    Edit
+                                </button>
+                            }
+                            else
+                            {
+                                <a asp-controller="Employee"
+                                   asp-action="Edit"
+                                   asp-route-id="@employee.EmployeeId"
+                                   class="btn btn-sm btn-outline-dark">
+                                    Edit
+                                </a>
+                            }
+
+                            @* TRANSFER *@
+                            @if (branchIsActive)
+                            {
+                                @if (employeeIsBranchManager && isBranchManagerUser)
+                                {
+                                    <button type="button"
+                                            class="btn btn-sm btn btn-sm btn-outline-secondary"
+                                            disabled
+                                            title="Branch managers cannot transfer another branch manager.">
+                                        Transfer
+                                    </button>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Employee"
+                                       asp-action="Transfer"
+                                       asp-route-id="@employee.EmployeeId"
+                                       class="btn btn-sm btn btn-sm btn-outline-secondary">
+                                        Transfer
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-secondary"
+                                        disabled
+                                        title="Cannot transfer: current branch is inactive">
+                                    Transfer
+                                </button>
+                            }
+
+                            @* DELETE *@
+                            @if (employeeIsBranchManager && isBranchManagerUser)
+                            {
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger"
+                                        disabled
+                                        title="Branch managers cannot delete another branch manager.">
+                                    Delete
+                                </button>
+                            }
+                            else
+                            {
+                                <a asp-controller="Employee"
+                                   asp-action="Delete"
+                                   asp-route-id="@employee.EmployeeId"
+                                   class="btn btn-sm btn-outline-danger">
+                                    Delete
+                                </a>
+                            }
+
+                        </td>
+
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+</div>
+
+<!-- View Employee modal -->
+<div class="modal fade" id="viewBranchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body" id="viewBranchModalBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-dark" role="status"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const modal = new bootstrap.Modal(document.getElementById("viewBranchModal"));
+            const modalBody = document.getElementById("viewBranchModalBody");
+
+            document.querySelectorAll(".view-branch-link").forEach(function (link) {
+
+                link.addEventListener("click", function (e) {
+
+                    e.preventDefault();
+
+                    const branchId = this.dataset.branchId;
+
+                    modalBody.innerHTML =
+                        '<div class="text-center py-4"><div class="spinner-border text-dark" role="status"></div></div>';
+
+                    fetch("/Branch/ViewModal/" + branchId)
+                        .then(function (response) {
+                            if (!response.ok)
+                                throw new Error("Failed to load branch details");
+
+                            return response.text();
+                        })
+                        .then(function (html) {
+                            modalBody.innerHTML = html;
+                            modal.show();
+                        })
+                        .catch(function () {
+                            modalBody.innerHTML =
+                                '<div class="alert alert-danger m-3">Could not load branch details.</div>';
+
+                            modal.show();
+                        });
+
+                });
+
+            });
+
+        });
+    </script>
+}

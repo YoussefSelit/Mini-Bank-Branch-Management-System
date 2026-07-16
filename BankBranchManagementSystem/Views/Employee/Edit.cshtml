@@ -1,0 +1,130 @@
+﻿@model BankBranchManagementSystem.ViewModels.EditEmployeeViewModel
+
+@{
+    ViewData["Title"] = "Edit Employee";
+}
+
+<div class="d-flex justify-content-center mt-4">
+    <div class="card shadow-sm" style="max-width:650px; width:100%;">
+        <div class="card-header bg-dark text-white">
+            <h3 class="mb-0">Edit Employee</h3>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-controller="Employee"
+                  asp-action="Edit"
+                  asp-route-id="@Model.EmployeeId"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="EmployeeId" />
+
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label asp-for="EmployeeFirstName" class="form-label"></label>
+                        <input asp-for="EmployeeFirstName" class="form-control" />
+                        <span asp-validation-for="EmployeeFirstName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col">
+                        <label asp-for="EmployeeLastName" class="form-label"></label>
+                        <input asp-for="EmployeeLastName" class="form-control" />
+                        <span asp-validation-for="EmployeeLastName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EmployeeJobTitle" class="form-label"></label>
+                    <input asp-for="EmployeeJobTitle" class="form-control" />
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label asp-for="EmployeeEmail" class="form-label"></label>
+                        <input asp-for="EmployeeEmail"
+                               class="form-control"
+                               type="email" />
+                        <span asp-validation-for="EmployeeEmail"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col">
+                        <label asp-for="EmployeePhone" class="form-label"></label>
+                        <input asp-for="EmployeePhone"
+                               class="form-control"
+                               type="tel" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EmployeeHireDate" class="form-label"></label>
+                    <input asp-for="EmployeeHireDate"
+                           class="form-control"
+                           type="date"
+                           max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EmployeeBranchId" class="form-label"></label>
+
+                    <select asp-for="EmployeeBranchId" class="form-select">
+
+                        @foreach (var branch in (IEnumerable<dynamic>)ViewBag.Branches)
+                        {
+                            bool disableOption = !branch.IsActive && !branch.IsCurrent;
+
+                            <option value="@branch.BranchId"
+                                    disabled="@disableOption">
+
+                                @branch.BranchName
+                                @(!branch.IsActive ? "(Inactive)" : "")
+
+                            </option>
+                        }
+
+                    </select>
+
+                    <span asp-validation-for="EmployeeBranchId"
+                          class="text-danger"></span>
+
+                    <div class="form-text">
+                        Inactive branches are shown greyed out. Employees cannot be moved into inactive branches.
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="EmploymentStatus" class="form-label"></label>
+
+                    <select asp-for="EmploymentStatus" class="form-select">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="text-end">
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-dark">
+                        Cancel
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-danger">
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

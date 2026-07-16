@@ -1,0 +1,66 @@
+﻿@using BankBranchManagementSystem.Constants
+@{
+    bool isAdmin = User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole(RoleNames.Admin);
+    string currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    string NavClass(string controllerName) => currentController.Equals(controllerName, StringComparison.OrdinalIgnoreCase) ? "nav-link active" : "nav-link";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BankBranchManagementSystem</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <header class="navbar">
+            <div class="navbar-container">
+                <a class="navbar-logo" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/adcb-logo.webp" alt="ADCB" class="logo-img" />
+                </a>
+
+                <div class="navbar-right">
+                    <nav class="navbar-links">
+                        <a class="@NavClass("Home")" asp-controller="Home" asp-action="Index">Dashboard</a>
+                        <a class="@NavClass("Employee")" asp-controller="Employee" asp-action="Index">Employees</a>
+                        <a class="@NavClass("Branch")" asp-controller="Branch" asp-action="Index">Branches</a>
+                        <a class="@NavClass("Report")" asp-controller="Report" asp-action="GenerateReport">Reports</a>
+
+                        @if (isAdmin)
+                        {
+                            <a class="@NavClass("AuditLog")"
+                               asp-controller="AuditLog"
+                               asp-action="Index">
+                                Audit Logs
+                            </a>
+                        }
+                    </nav>
+
+                    <div class="navbar-actions">
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">Log out</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </header>
+    }
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

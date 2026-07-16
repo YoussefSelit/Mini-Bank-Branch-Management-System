@@ -1,0 +1,148 @@
+﻿@model BankBranchManagementSystem.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h1 class="mb-4">Dashboard</h1>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card dashboard-card text-center shadow-sm">
+            <div class="card-body">
+                <h2 class="display-6">@Model.TotalBranches</h2>
+                <p class="text-muted mb-0">Total Branches</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card dashboard-card text-center shadow-sm">
+            <div class="card-body">
+                <h2 class="display-6">@Model.TotalEmployees</h2>
+                <p class="text-muted mb-0">Total Employees</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card dashboard-card text-center shadow-sm">
+            <div class="card-body">
+                <h2 class="display-6">@Model.ActiveBranches</h2>
+                <p class="text-muted mb-0">Active Branches</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card dashboard-card shadow-sm">
+            <div class="card-header">Our Newest Branches</div>
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Branch name (code)</th>
+                        <th>Date of opening</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.RecentBranches.Count == 0)
+                    {
+                        <tr><td colspan="2" class="text-muted">No branches yet.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var branch in Model.RecentBranches)
+                        {
+                            <tr>
+                                <td>
+                                    <a href="#" class="dashboard-link view-branch-link" data-branch-id="@branch.BranchId">
+                                        @branch.BranchName (@branch.BranchCode)
+                                    </a>
+                                </td>
+                                <td>@(branch.BranchOpeningDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card dashboard-card shadow-sm">
+            <div class="card-header">Employees per Branch</div>
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Branch name</th>
+                        <th>Employee Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.EmployeesPerBranch.Count == 0)
+                    {
+                        <tr><td colspan="2" class="text-muted">No data yet.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model.EmployeesPerBranch)
+                        {
+                            <tr>
+                                <td>
+                                    <a href="#" class="dashboard-link view-branch-link" data-branch-id="@item.BranchId">
+                                        @item.BranchName
+                                    </a>
+                                </td>
+                                <td>@item.EmployeeCount</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- View Branch modal shell: body gets filled in via JS from /Branch/ViewModal/{id} -->
+<div class="modal fade" id="viewBranchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body" id="viewBranchModalBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var modalEl = document.getElementById('viewBranchModal');
+            var modalBody = document.getElementById('viewBranchModalBody');
+            var modal = new bootstrap.Modal(modalEl);
+
+            document.querySelectorAll('.view-branch-link').forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var branchId = this.getAttribute('data-branch-id');
+
+                    modalBody.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></div>';
+                    modal.show();
+
+                    fetch('/Branch/ViewModal/' + branchId)
+                        .then(function (response) {
+                            if (!response.ok) throw new Error('Failed to load branch details');
+                            return response.text();
+                        })
+                        .then(function (html) {
+                            modalBody.innerHTML = html;
+                        })
+                        .catch(function () {
+                            modalBody.innerHTML = '<div class="alert alert-danger m-3">Could not load branch details.</div>';
+                        });
+                });
+            });
+        })();
+    </script>
+}

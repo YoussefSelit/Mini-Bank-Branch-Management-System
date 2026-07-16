@@ -1,0 +1,46 @@
+﻿<style>
+    .view-branch-link {
+        transition: .2s;
+    }
+
+        .view-branch-link:hover {
+            color: #dc3545 !important;
+        }
+</style>
+
+@section Scripts {
+    <script>
+        (function () {
+            var modalEl = document.getElementById('viewBranchModal');
+            var modalBody = document.getElementById('viewBranchModalBody');
+            var modal = new bootstrap.Modal(modalEl);
+
+            document.querySelectorAll('.view-branch-link').forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    var branchId = this.getAttribute('data-branch-id');
+
+                    modalBody.innerHTML =
+                        '<div class="text-center py-4"><div class="spinner-border text-dark"></div></div>';
+
+                    modal.show();
+
+                    fetch('/Branch/ViewModal/' + branchId)
+                        .then(function (response) {
+                            if (!response.ok) throw new Error();
+
+                            return response.text();
+                        })
+                        .then(function (html) {
+                            modalBody.innerHTML = html;
+                        })
+                        .catch(function () {
+                            modalBody.innerHTML =
+                                '<div class="alert alert-danger">Could not load branch details.</div>';
+                        });
+                });
+            });
+        })();
+    </script>
+}

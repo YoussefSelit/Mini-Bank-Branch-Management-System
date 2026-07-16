@@ -1,0 +1,205 @@
+﻿@model BankBranchManagementSystem.ViewModels.EditBranchViewModel
+
+@{
+    ViewData["Title"] = "Edit Branch";
+}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height:80vh; padding-top:40px;">
+
+    <div class="card shadow-lg border-0" style="width:100%; max-width:700px; border-radius:15px;">
+
+        <div class="card-header bg-dark text-white text-center py-3">
+            <h2 class="mb-0">Edit Branch</h2>
+        </div>
+
+        <div class="card-body p-4">
+
+            <form asp-controller="Branch"
+                  asp-action="Edit"
+                  asp-route-id="@Model.BranchId"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="BranchId" />
+
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <div class="row mb-3">
+
+                    <div class="col">
+                        <label asp-for="BranchCode" class="form-label fw-semibold"></label>
+                        <input asp-for="BranchCode" class="form-control" />
+                        <span asp-validation-for="BranchCode" class="text-danger"></span>
+                    </div>
+
+                    <div class="col">
+                        <label asp-for="BranchName" class="form-label fw-semibold"></label>
+                        <input asp-for="BranchName" class="form-control" />
+                        <span asp-validation-for="BranchName" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BranchAddress" class="form-label fw-semibold"></label>
+                    <input asp-for="BranchAddress" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BranchCity" class="form-label fw-semibold"></label>
+                    <input asp-for="BranchCity" class="form-control" />
+                </div>
+
+                <div class="row mb-3">
+
+                    <div class="col">
+                        <label asp-for="BranchEmail" class="form-label fw-semibold"></label>
+                        <input asp-for="BranchEmail" class="form-control" type="email" />
+                        <span asp-validation-for="BranchEmail" class="text-danger"></span>
+                    </div>
+
+                    <div class="col">
+                        <label asp-for="BranchPhone" class="form-label fw-semibold"></label>
+                        <input asp-for="BranchPhone" class="form-control" type="tel" />
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="BranchManager" class="form-label fw-semibold">
+                        Branch Manager
+                    </label>
+
+                    <select asp-for="BranchManager"
+                            class="form-select"
+                            id="managerSelect">
+
+                        <option value="">-- Select Manager --</option>
+
+                        @foreach (dynamic employee in ViewBag.Employees)
+                        {
+                            <option value="@employee.EmployeeId"
+                                    disabled="@employee.IsManager">
+
+                                @employee.FullName
+                                @(employee.IsManager
+                                    ? " (Already managing another branch)"
+                                    : "")
+
+                            </option>
+                        }
+
+                    </select>
+
+                </div>
+
+                <!-- Hidden unless manager changes -->
+                <div class="mb-3"
+                     id="oldManagerJobContainer"
+                     style="display:none;">
+
+                    <label asp-for="OldManagerNewJobTitle"
+                           class="form-label fw-semibold">
+                        New Job Title for Previous Manager
+                    </label>
+
+                    <input asp-for="OldManagerNewJobTitle"
+                           class="form-control" />
+
+                    <span asp-validation-for="OldManagerNewJobTitle"
+                          class="text-danger"></span>
+
+                    <div class="form-text">
+                        Only required if you assign a different branch manager.
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BranchOpeningDate" class="form-label fw-semibold"></label>
+                    <input asp-for="BranchOpeningDate"
+                           class="form-control"
+                           type="date"
+                           max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="BranchStatus"
+                           class="form-label fw-semibold"></label>
+
+                    <select asp-for="BranchStatus"
+                            class="form-select">
+
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+
+                    </select>
+
+                    <div class="form-text">
+                        You can also change this from the Branch Management page.
+                    </div>
+
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+
+                    <a asp-controller="Branch"
+                       asp-action="Index"
+                       class="btn btn-dark px-4">
+                        Cancel
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-danger px-4">
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const managerSelect = document.getElementById("managerSelect");
+            const jobContainer = document.getElementById("oldManagerJobContainer");
+
+            // Manager currently assigned to this branch
+            const currentManager = "@Model.BranchManager";
+
+            function toggleJobField() {
+
+                if (managerSelect.value &&
+                    managerSelect.value !== currentManager) {
+
+                    jobContainer.style.display = "block";
+                }
+                else {
+
+                    jobContainer.style.display = "none";
+                }
+
+            }
+
+            toggleJobField();
+
+            managerSelect.addEventListener("change", toggleJobField);
+
+        });
+
+    </script>
+
+}

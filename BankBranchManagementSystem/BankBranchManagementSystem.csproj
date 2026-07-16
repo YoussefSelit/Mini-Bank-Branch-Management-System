@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Bogus" Version="35.6.5" />
+		<PackageReference Include="ClosedXML" Version="0.104.2" />
+		<PackageReference Include="QuestPDF" Version="2024.10.2" />
+		<PackageReference Include="libphonenumber-csharp" Version="9.0.34" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.10" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.9">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="wwwroot\images\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\BankBranchManagementSystem.Business\BankBranchManagementSystem.Business.csproj" />
+	  <ProjectReference Include="..\BankBranchManagementSystem.Dtos\BankBranchManagementSystem.Dtos.csproj" />
+	  <ProjectReference Include="..\BankBranchManagementSystem.ViewModels\BankBranchManagementSystem.ViewModels.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,46 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "Sign in";
+    var returnUrl = ViewData["ReturnUrl"] as string;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign in - BankBranchManagementSystem</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/Account/login.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="login-container1">
+        <div class="login-container2">
+            <span class="login-text1">Sign in</span>
+
+            <div class="login-container3">
+                <form asp-controller="Account" asp-action="Login" method="post" novalidate>
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger login-error" role="alert">
+                            @Html.ValidationSummary(true, "", new { @class = "login-error-list" })
+                        </div>
+                    }
+
+                    <span class="login-text2">Username</span>
+                    <input type="text" name="username" placeholder="Enter your username"
+                           class="login-textinput1 input" autocomplete="username" autofocus required />
+
+                    <span class="login-text3">Password</span>
+                    <input type="password" name="password" placeholder="Enter your password"
+                           class="login-textinput2 input" autocomplete="current-password" required />
+
+                    <button type="submit" class="login-button1 button">Sign In</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "Generate Report";
+}
+
+<h1 class="mb-4 text-center">Generate Report</h1>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger mx-auto" style="max-width: 500px;" role="alert">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <div>@error.ErrorMessage</div>
+        }
+    </div>
+}
+
+<div class="card shadow-sm mx-auto" style="max-width: 500px;">
+    <div class="card-header text-center">Select Report Details</div>
+    <div class="card-body text-center">
+        <form asp-controller="Report" asp-action="Export" method="post" id="reportForm">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label for="reportType" class="form-label">Report Type</label>
+                <select name="reportType" id="reportType" class="form-select" required>
+                    <option value="" selected disabled>-- Select a report type --</option>
+                    <option value="Branch List">Branch List</option>
+                    <option value="List of Employees by Branch">List of Employees by Branch</option>
+                    <option value="List of Active Branches">List of Active Branches</option>
+                    <option value="Employee Distribution Report">Employee Distribution Report</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="exportFormat" class="form-label">Document Type</label>
+                <select name="exportFormat" id="exportFormat" class="form-select" required>
+                    <option value="" selected disabled>-- Select an export format --</option>
+                    <option value="Export as PDF">Export as PDF</option>
+                    <option value="Export as Excel sheet">Export as Excel sheet</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="exportButton" disabled>Export</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var reportType = document.getElementById('reportType');
+            var exportFormat = document.getElementById('exportFormat');
+            var exportButton = document.getElementById('exportButton');
+
+            function updateButtonState() {
+                exportButton.disabled = !(reportType.value && exportFormat.value);
+            }
+
+            reportType.addEventListener('change', updateButtonState);
+            exportFormat.addEventListener('change', updateButtonState);
+            updateButtonState();
+        })();
+    </script>
+}

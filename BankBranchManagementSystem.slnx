@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="BankBranchManagementSystem.Business/BankBranchManagementSystem.Business.csproj" Id="a6b7ce90-797e-4e72-a2f7-17ba9d093566" />
+  <Project Path="BankBranchManagementSystem.Data/BankBranchManagementSystem.Data.csproj" Id="ffb8d47d-1de9-4d36-908c-a221279d1911" />
+  <Project Path="BankBranchManagementSystem.Dtos/BankBranchManagementSystem.Dtos.csproj" Id="2aefe1b7-fe48-4833-94ee-b7651b5a3ec9" />
+  <Project Path="BankBranchManagementSystem.Models/BankBranchManagementSystem.Models.csproj" Id="144d5390-50f1-4bdd-ab14-858040fbab43" />
+  <Project Path="BankBranchManagementSystem.ViewModels/BankBranchManagementSystem.ViewModels.csproj" Id="7614de66-3016-421b-a493-84352662491d" />
+  <Project Path="BankBranchManagementSystem/BankBranchManagementSystem.csproj" />
+</Solution>

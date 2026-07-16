@@ -1,0 +1,118 @@
+/* ===== Navbar ===== */
+.navbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e2e5e9;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    padding: 0 1.5rem;
+}
+
+.navbar-container {
+    display: flex;
+    align-items: center;
+    height: 64px;
+    width: 100%;
+    gap: 2rem;
+}
+
+/* Logo: pinned to the very left */
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: #1a202c;
+    flex-shrink: 0;
+}
+
+    .navbar-logo .logo-img {
+        height: 60px;
+        width: auto;
+        display: block;
+    }
+
+/* Right group: nav links + logout, pushed to the very right */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-left: auto;
+}
+
+/* Links: lined up horizontally */
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+}
+
+    .navbar-links .nav-link {
+        color: #000000;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95rem;
+        padding: 0.5rem 0.9rem;
+        border-radius: 6px;
+        white-space: nowrap;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+        .navbar-links .nav-link:hover {
+            background-color: #f1f4f8;
+            color: #d1112a;
+        }
+
+        .navbar-links .nav-link.active {
+            background-color: #fbe3e5;
+            color: #d1112a;
+        }
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-left: 1.5rem;
+    border-left: 1px solid #e2e5e9;
+}
+
+/* Small screens: allow wrapping instead of squeezing everything */
+@media (max-width: 900px) {
+    .navbar-container {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 0.75rem 0;
+        gap: 0.75rem;
+    }
+
+    .navbar-right {
+        margin-left: 0;
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .navbar-links {
+        flex-wrap: wrap;
+    }
+}
+
+/* ===== Dashboard ===== */
+.dashboard-link {
+    color: #000000;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+    .dashboard-link:hover {
+        color: #d1112a;
+        text-decoration: underline;
+    }
+
+.dashboard-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .dashboard-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12) !important;
+    }

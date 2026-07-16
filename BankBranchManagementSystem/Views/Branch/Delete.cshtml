@@ -1,0 +1,63 @@
+﻿@model BankBranchManagementSystem.Models.Branch
+
+@{
+    ViewData["Title"] = "Delete Branch";
+    bool hasActiveEmployees = ViewBag.HasActiveEmployees ?? false;
+}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height:80vh; padding-top:40px;">
+
+    <div class="card shadow-lg border-0" style="width:100%; max-width:600px; border-radius:15px;">
+
+        <div class="card-header bg-dark text-white text-center py-3">
+            <h2 class="mb-0">Delete Branch</h2>
+        </div>
+
+        <div class="card-body p-4">
+
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <p class="fs-5 mb-4 text-center">
+                Are you sure you want to delete
+                <strong>@Model.BranchName (@Model.BranchCode)</strong>?
+            </p>
+
+            @if (hasActiveEmployees)
+            {
+                <div class="alert alert-danger">
+                    <strong>This branch still has active employees.</strong>
+                    <br />
+                    Transfer or deactivate all employees before deleting this branch.
+                </div>
+            }
+
+            <form asp-controller="Branch"
+                  asp-action="Delete"
+                  asp-route-id="@Model.BranchId"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+
+                    <a asp-controller="Branch"
+                       asp-action="Index"
+                       class="btn btn-dark px-4">
+                        Cancel
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-danger px-4"
+                            disabled="@hasActiveEmployees">
+                        Delete Branch
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

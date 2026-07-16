@@ -1,0 +1,122 @@
+﻿@model BankBranchManagementSystem.ViewModels.CreateBranchViewModel
+
+@{
+    ViewData["Title"] = "Add Branch";
+}
+
+<div class="container d-flex justify-content-center align-items-center py-5">
+
+    <div class="card shadow-lg border-0" style="width:100%; max-width:700px; border-radius:15px;">
+
+        <div class="card-header bg-dark text-white text-center py-3">
+            <h2 class="mb-0">Add Branch</h2>
+        </div>
+
+        <div class="card-body p-4">
+
+            <form asp-controller="Branch" asp-action="Create" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <div class="row mb-3">
+
+                    <div class="col">
+                        <label asp-for="BranchCode" class="form-label fw-semibold"></label>
+                        <input asp-for="BranchCode" class="form-control" />
+                        <span asp-validation-for="BranchCode" class="text-danger"></span>
+                    </div>
+
+                    <div class="col">
+                        <label asp-for="BranchName" class="form-label fw-semibold"></label>
+                        <input asp-for="BranchName" class="form-control" />
+                        <span asp-validation-for="BranchName" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BranchAddress" class="form-label fw-semibold"></label>
+                    <input asp-for="BranchAddress" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BranchCity" class="form-label fw-semibold"></label>
+                    <input asp-for="BranchCity" class="form-control" />
+                </div>
+
+                <div class="row mb-3">
+
+                    <div class="col">
+                        <label asp-for="BranchEmail" class="form-label fw-semibold"></label>
+                        <input asp-for="BranchEmail" class="form-control" type="email" />
+                        <span asp-validation-for="BranchEmail" class="text-danger"></span>
+                    </div>
+
+                    <div class="col">
+                        <label asp-for="BranchPhone" class="form-label fw-semibold"></label>
+                        <input asp-for="BranchPhone" class="form-control" type="tel" />
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="BranchManager" class="form-label fw-semibold">
+                        Branch Manager
+                    </label>
+
+                    <select asp-for="BranchManager" class="form-select">
+
+                        <option value="">-- Select Branch Manager --</option>
+
+                        @foreach (var employee in (IEnumerable<dynamic>)ViewBag.Employees)
+                        {
+                            <option value="@employee.EmployeeId"
+                                    disabled="@employee.IsManager">
+
+                                @employee.FullName
+                                @(employee.IsManager ? " (Already a manager)" : "")
+
+                            </option>
+                        }
+
+                    </select>
+
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BranchOpeningDate" class="form-label fw-semibold"></label>
+                    <input asp-for="BranchOpeningDate"
+                           class="form-control"
+                           type="date"
+                           max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+
+                    <a asp-controller="Branch"
+                       asp-action="Index"
+                       class="btn btn-dark px-4">
+                        Cancel
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-danger px-4">
+                        Add Branch
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
