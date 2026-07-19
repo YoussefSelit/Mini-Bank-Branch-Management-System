@@ -1,4 +1,6 @@
-﻿using BankBranchManagementSystem.Interfaces;
+﻿using BankBranchManagementSystem.Constants;
+using BankBranchManagementSystem.Dtos;
+using BankBranchManagementSystem.Interfaces;
 using BankBranchManagementSystem.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -212,5 +214,56 @@ namespace BankBranchManagementSystem.Controllers
         //        .Select(r => new { r.RoleId, r.RoleName })
         //        .ToList();
         //}
+
+        // GET: /User/CreateAdmin
+        [HttpGet]
+        [Authorize(Roles = RoleNames.Admin)]
+        public IActionResult CreateAdmin() => View();
+
+        // POST: /User/CreateAdmin
+        [HttpPost]
+        [Authorize(Roles = RoleNames.Admin)]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateAdmin(CreateAdminAccountViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            try
+            {
+                var dto = new CreateAdminDto
+                {
+                    UserFirstName = model.UserFirstName,
+                    UserLastName = model.UserLastName,
+                    UserPassword = model.UserPassword,
+                    UserEmail = model.UserEmail,
+                    UserPhoneNumber = model.UserPhoneNumber
+                };
+
+                var created = await _userService.CreateAdminAccountAsync(GetCurrentUserId(), dto);
+
+                TempData["Success"] = $"Admin account '{created.UserUsername}' created successfully.";
+                return RedirectToAction(nameof(CreateAdmin));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(model);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(model);
+            }
+        }
+
+
     }
+
+
+
 }

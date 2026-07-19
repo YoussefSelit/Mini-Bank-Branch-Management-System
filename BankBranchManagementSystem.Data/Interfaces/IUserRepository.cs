@@ -19,6 +19,8 @@ namespace BankBranchManagementSystem.Interfaces
 
         Task<User?> GetByEmployeeIdAsync(int employeeId);
 
+        Task<List<string>> GetUsernamesByPrefixAsync(string prefix);
+
         void Delete(User user);
         Task SaveChangesAsync();
     }

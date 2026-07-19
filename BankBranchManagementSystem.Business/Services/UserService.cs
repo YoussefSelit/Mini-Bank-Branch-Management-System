@@ -1,8 +1,10 @@
-﻿using BankBranchManagementSystem.Dtos;
+﻿using BankBranchManagementSystem.Constants;
+using BankBranchManagementSystem.Dtos;
 using BankBranchManagementSystem.Interfaces;
 using BankBranchManagementSystem.Models;
 using BankBranchManagementSystem.Repositories;
 using BankBranchManagementSystem.Validators;
+using System.Text.RegularExpressions;
 
 namespace BankBranchManagementSystem.Services
 {
@@ -235,6 +237,85 @@ namespace BankBranchManagementSystem.Services
         ? $"{u.Employee.EmployeeFirstName} {u.Employee.EmployeeLastName}"
         : null
         };
+
+
+        public async Task<UserDto> CreateAdminAccountAsync(int requestingAdminId, CreateAdminDto dto)
+        {
+            var requestingAdmin = await userRepository.GetUserWithRoleAsync(requestingAdminId);
+            if (requestingAdmin == null)
+                throw new KeyNotFoundException("Requesting user not found.");
+
+            if (requestingAdmin.UserRole == null || requestingAdmin.UserRole.RoleName != RoleNames.Admin)
+                throw new UnauthorizedAccessException("Only administrators can create admin accounts.");
+
+            if (string.IsNullOrWhiteSpace(dto.UserPassword))
+                throw new InvalidOperationException("Password is required.");
+
+            if (!string.IsNullOrWhiteSpace(dto.UserEmail))
+            {
+                if (!ContactValidator.IsValidEmail(dto.UserEmail))
+                    throw new InvalidOperationException("Invalid email format.");
+
+                if (await userRepository.EmailExistsAsync(dto.UserEmail, 0))
+                    throw new InvalidOperationException("Email already exists.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.UserPhoneNumber))
+            {
+                if (!ContactValidator.IsValidPhone(dto.UserPhoneNumber))
+                    throw new InvalidOperationException("Invalid phone number.");
+
+                if (await userRepository.PhoneExistsAsync(dto.UserPhoneNumber, 0))
+                    throw new InvalidOperationException("Phone number already exists.");
+            }
+
+            var adminRole = await roleRepository.GetRoleByNameAsync(RoleNames.Admin);
+            if (adminRole == null)
+                throw new KeyNotFoundException("Admin role not found in database.");
+
+            var username = await GenerateNextAdminUsernameAsync();
+
+            var newAdmin = new User
+            {
+                EmployeeId = null,
+                UserFirstName = dto.UserFirstName,
+                UserLastName = dto.UserLastName,
+                UserUsername = username,
+                UserPassword = dto.UserPassword, // see note below re: hashing
+                UserRoleId = adminRole.RoleId,
+                UserEmail = dto.UserEmail,
+                UserPhoneNumber = dto.UserPhoneNumber
+            };
+
+            await userRepository.AddAsync(newAdmin);
+            await userRepository.SaveChangesAsync();
+
+            return MapToDto(newAdmin);
+        }
+
+        private async Task<string> GenerateNextAdminUsernameAsync()
+        {
+            var existingUsernames = await userRepository.GetUsernamesByPrefixAsync("admin");
+
+            int highestSuffix = 0; // bare "admin" is treated as suffix 1
+            foreach (var uname in existingUsernames)
+            {
+                if (string.Equals(uname, "admin", StringComparison.OrdinalIgnoreCase))
+                {
+                    highestSuffix = Math.Max(highestSuffix, 1);
+                    continue;
+                }
+
+                var match = Regex.Match(uname, @"^admin(\d+)$", RegexOptions.IgnoreCase);
+                if (match.Success)
+                {
+                    var num = int.Parse(match.Groups[1].Value);
+                    highestSuffix = Math.Max(highestSuffix, num);
+                }
+            }
+
+            return $"admin{highestSuffix + 1}";
+        }
 
     }
 }

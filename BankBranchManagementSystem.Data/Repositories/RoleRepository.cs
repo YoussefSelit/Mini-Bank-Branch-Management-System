@@ -12,6 +12,12 @@ namespace BankBranchManagementSystem.Repositories
         {
         }
 
+        public async Task<Role?> GetRoleByNameAsync(string roleName)
+        {
+            return await _context.Roles
+                .FirstOrDefaultAsync(r => r.RoleName == roleName);
+        }
+
 
     }
 }
