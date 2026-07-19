@@ -14,10 +14,10 @@ namespace BankBranchManagementSystem.Dtos
         [DataType(DataType.Password)]
         public string UserPassword { get; set; } = null!;
 
-        [EmailAddress, StringLength(50)]
-        public string? UserEmail { get; set; }
+        [Required, EmailAddress, StringLength(50)]
+        public string UserEmail { get; set; } = null!;
 
-        [Phone, StringLength(50)]
-        public string? UserPhoneNumber { get; set; }
+        [Required, Phone, StringLength(50)]
+        public string UserPhoneNumber { get; set; } = null!;
     }
 }

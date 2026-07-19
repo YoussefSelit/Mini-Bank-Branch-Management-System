@@ -13,12 +13,14 @@ namespace BankBranchManagementSystem.Services
         private readonly IUserRepository userRepository;
         private readonly IEmployeeRepository employeeRepository;
         private readonly IRoleRepository roleRepository;
+        private readonly IAuditLogService auditLogService;
 
-        public UserService(IUserRepository userRepository, IEmployeeRepository employeeRepository, IRoleRepository roleRepository)
+        public UserService(IUserRepository userRepository, IEmployeeRepository employeeRepository, IRoleRepository roleRepository, IAuditLogService auditLogService)
         {
             this.userRepository = userRepository;
             this.employeeRepository = employeeRepository;
             this.roleRepository = roleRepository;
+            this.auditLogService = auditLogService;
         }
 
         public async Task<User?> LoginAsync(string username, string password)
@@ -251,24 +253,23 @@ namespace BankBranchManagementSystem.Services
             if (string.IsNullOrWhiteSpace(dto.UserPassword))
                 throw new InvalidOperationException("Password is required.");
 
-            if (!string.IsNullOrWhiteSpace(dto.UserEmail))
-            {
-                if (!ContactValidator.IsValidEmail(dto.UserEmail))
-                    throw new InvalidOperationException("Invalid email format.");
+            if (string.IsNullOrWhiteSpace(dto.UserEmail))
+                throw new InvalidOperationException("Email is required.");
 
-                if (await userRepository.EmailExistsAsync(dto.UserEmail, 0))
-                    throw new InvalidOperationException("Email already exists.");
-            }
+            if (!ContactValidator.IsValidEmail(dto.UserEmail))
+                throw new InvalidOperationException("Invalid email format.");
 
-            if (!string.IsNullOrWhiteSpace(dto.UserPhoneNumber))
-            {
-                if (!ContactValidator.IsValidPhone(dto.UserPhoneNumber))
-                    throw new InvalidOperationException("Invalid phone number.");
+            if (await userRepository.EmailExistsAsync(dto.UserEmail, null))
+                throw new InvalidOperationException("Email already exists.");
 
-                if (await userRepository.PhoneExistsAsync(dto.UserPhoneNumber, 0))
-                    throw new InvalidOperationException("Phone number already exists.");
-            }
+            if (string.IsNullOrWhiteSpace(dto.UserPhoneNumber))
+                throw new InvalidOperationException("Phone number is required.");
 
+            if (!ContactValidator.IsValidPhone(dto.UserPhoneNumber))
+                throw new InvalidOperationException("Invalid phone number.");
+
+            if (await userRepository.PhoneExistsAsync(dto.UserPhoneNumber, null))
+                throw new InvalidOperationException("Phone number already exists.");
             var adminRole = await roleRepository.GetRoleByNameAsync(RoleNames.Admin);
             if (adminRole == null)
                 throw new KeyNotFoundException("Admin role not found in database.");
@@ -289,6 +290,14 @@ namespace BankBranchManagementSystem.Services
 
             await userRepository.AddAsync(newAdmin);
             await userRepository.SaveChangesAsync();
+            await auditLogService.LogAsync(new CreateAuditLogDto
+            {
+                UserId = requestingAdminId,
+                Action = "Create",
+                EntityName = "Employee",
+                // EmployeeId and BranchId are left null — this action isn't tied to either
+            });
+
 
             return MapToDto(newAdmin);
         }

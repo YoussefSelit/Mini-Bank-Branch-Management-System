@@ -22,12 +22,12 @@ namespace BankBranchManagementSystem.Controllers
         }
 
         // GET: /Branch
-        public async Task<IActionResult> Index()
-        {
-            var branches = await _branchService.GetAllBranchesAsync();
-            await PopulateDeleteFlagsAsync(branches);   
-            return View("BranchManagement", branches);
-        }
+        //public async Task<IActionResult> Index()
+        //{
+        //    var branches = await _branchService.GetAllBranchesAsync();
+        //    await PopulateDeleteFlagsAsync(branches);   
+        //    return View("BranchManagement", branches);
+        //}
 
         // GET: /Branch/Details/5  (full-page fallback / direct link)
         public async Task<IActionResult> Details(int id)
@@ -239,15 +239,15 @@ namespace BankBranchManagementSystem.Controllers
         }
 
         // GET: /Branch/Search?searchTerm=
-        public async Task<IActionResult> Search(string? searchTerm)
-        {
-            var results = string.IsNullOrWhiteSpace(searchTerm)
-                ? await _branchService.GetAllBranchesAsync()
-                : await _branchService.SearchBranchesAsync(searchTerm);
+        //public async Task<IActionResult> Search(string? searchTerm)
+        //{
+        //    var results = string.IsNullOrWhiteSpace(searchTerm)
+        //        ? await _branchService.GetAllBranchesAsync()
+        //        : await _branchService.SearchBranchesAsync(searchTerm);
 
-            await PopulateDeleteFlagsAsync(results);   
-            return View("BranchManagement", results);
-        }
+        //    await PopulateDeleteFlagsAsync(results);   
+        //    return View("BranchManagement", results);
+        //}
 
         private async Task PopulateManagerDropdownAsync(int? currentManagerId = null)
         {
@@ -276,4 +276,19 @@ namespace BankBranchManagementSystem.Controllers
 
             ViewBag.CanDelete = canDelete;
         }
-    }}
+        
+        public async Task<IActionResult> Index(int pageNumber = 1)
+        {
+            var result = await _branchService.GetBranchesPagedAsync(pageNumber, 10);
+            await PopulateDeleteFlagsAsync(result.Items);
+            return View("BranchManagement", result);
+        }
+
+        public async Task<IActionResult> Search(string? searchTerm, int pageNumber = 1)
+        {
+            var result = await _branchService.GetBranchesPagedAsync(pageNumber, 10, searchTerm);
+            await PopulateDeleteFlagsAsync(result.Items);
+            return View("BranchManagement", result);
+        }
+    }
+}

@@ -20,4 +20,7 @@ public interface IBranchRepository : IExtendedRepository<Branch>
     Task<bool> IsBranchManagerAsync(int employeeId);
 
     Task<Branch?> GetBranchByManagerAsync(int managerId);
+
+    Task<(IEnumerable<Branch> Items, int TotalCount)> GetAllPagedAsync(int pageNumber, int pageSize);
+    Task<(IEnumerable<Branch> Items, int TotalCount)> SearchBranchesPagedAsync(string? searchTerm, int pageNumber, int pageSize);
 }

@@ -21,11 +21,11 @@ namespace BankBranchManagementSystem.Controllers
         }
 
         // GET: /Employee
-        public async Task<IActionResult> Index()
-        {
-            var employees = await _employeeService.SearchEmployeesAsync(null);
-            return View("EmployeeManagement", employees);
-        }
+        //public async Task<IActionResult> Index()
+        //{
+        //    var employees = await _employeeService.SearchEmployeesAsync(null);
+        //    return View("EmployeeManagement", employees);
+        //}
 
         // GET: /Employee/Details/5  (full-page fallback / direct link)
         public async Task<IActionResult> Details(int id)
@@ -284,11 +284,11 @@ namespace BankBranchManagementSystem.Controllers
         }
 
         // GET: /Employee/Search?searchTerm=
-        public async Task<IActionResult> Search(string? searchTerm)
-        {
-            var results = await _employeeService.SearchEmployeesAsync(searchTerm);
-            return View("EmployeeManagement", results);
-        }
+        //public async Task<IActionResult> Search(string? searchTerm)
+        //{
+        //    var results = await _employeeService.SearchEmployeesAsync(searchTerm);
+        //    return View("EmployeeManagement", results);
+        //}
 
         /// <summary>
         /// Builds the branch dropdown used by Create/Edit/Transfer.
@@ -325,6 +325,18 @@ namespace BankBranchManagementSystem.Controllers
                     IsCurrent = b.BranchId == currentBranchId
                 })
                 .ToList();
+        }
+
+        public async Task<IActionResult> Index(int pageNumber = 1)
+        {
+            var result = await _employeeService.GetEmployeesPagedAsync(pageNumber, 10);
+            return View("EmployeeManagement", result);
+        }
+
+        public async Task<IActionResult> Search(string? searchTerm, int pageNumber = 1)
+        {
+            var result = await _employeeService.GetEmployeesPagedAsync(pageNumber, 10, searchTerm);
+            return View("EmployeeManagement", result);
         }
     }
 }

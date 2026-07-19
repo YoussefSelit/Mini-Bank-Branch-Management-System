@@ -1,8 +1,9 @@
-﻿@model IEnumerable<BankBranchManagementSystem.Dtos.BranchListDto>
+﻿@model BankBranchManagementSystem.Models.PagedResult<BankBranchManagementSystem.Dtos.BranchListDto>
 @{
     ViewData["Title"] = "Branch Management";
     bool isAdmin = User.IsInRole("Administrator") || User.IsInRole("Admin");
     var canDelete = ViewBag.CanDelete as Dictionary<int, bool> ?? new Dictionary<int, bool>();
+    string activeAction = string.IsNullOrWhiteSpace(Model.SearchTerm) ? "Index" : "Search";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -21,7 +22,7 @@
 </div>
 
 <form asp-controller="Branch" asp-action="Search" method="get" class="d-flex mb-4" style="max-width: 400px;">
-    <input type="text" name="searchTerm" class="form-control me-2" placeholder="Search by name or code..." value="@Context.Request.Query["searchTerm"]" />
+    <input type="text" name="searchTerm" class="form-control me-2" placeholder="Search by name or code..." value="@Model.SearchTerm" />
     <button type="submit" class="btn btn-outline-secondary">Search</button>
 </form>
 
@@ -38,13 +39,13 @@
             </tr>
         </thead>
         <tbody>
-            @if (!Model.Any())
+            @if (!Model.Items.Any())
             {
                 <tr><td colspan="6" class="text-muted text-center py-4">No branches found.</td></tr>
             }
             else
             {
-                @foreach (var branch in Model)
+                @foreach (var branch in Model.Items)
                 {
                     var isActive = branch.BranchStatus == "Active";
                     var branchCanDelete = canDelete.TryGetValue(branch.BranchId, out var val) && val;
@@ -108,6 +109,47 @@
         </tbody>
     </table>
 </div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="mt-3" aria-label="Branch pagination">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                <a class="page-link"
+                   asp-controller="Branch"
+                   asp-action="@activeAction"
+                   asp-route-searchTerm="@Model.SearchTerm"
+                   asp-route-pageNumber="@(Model.PageNumber - 1)">Previous</a>
+            </li>
+
+            @foreach (var pageNum in Model.GetPageNumbers())
+            {
+                if (pageNum == null)
+                {
+                    <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+                }
+                else
+                {
+                    <li class="page-item @(pageNum == Model.PageNumber ? "active" : "")">
+                        <a class="page-link"
+                           asp-controller="Branch"
+                           asp-action="@activeAction"
+                           asp-route-searchTerm="@Model.SearchTerm"
+                           asp-route-pageNumber="@pageNum">@pageNum</a>
+                    </li>
+                }
+            }
+
+            <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                <a class="page-link"
+                   asp-controller="Branch"
+                   asp-action="@activeAction"
+                   asp-route-searchTerm="@Model.SearchTerm"
+                   asp-route-pageNumber="@(Model.PageNumber + 1)">Next</a>
+            </li>
+        </ul>
+    </nav>
+}
 
 <!-- View Branch modal shell: body gets filled in via JS from /Branch/ViewModal/{id} -->
 <div class="modal fade" id="viewBranchModal" tabindex="-1" aria-hidden="true">

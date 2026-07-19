@@ -36,6 +36,6 @@ namespace BankBranchManagementSystem.Interfaces
         Task<int> GetActiveBranchesAsync();
         Task<IEnumerable<Branch>> GetRecentlyAddedBranchesAsync();
 
-
+        Task<PagedResult<BranchListDto>> GetBranchesPagedAsync(int pageNumber, int pageSize, string? searchTerm = null);
     }
 }
