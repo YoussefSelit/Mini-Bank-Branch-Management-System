@@ -56,5 +56,29 @@ public class EmployeeRepository : ExtendedRepository<Employee>, IEmployeeReposit
             .ToDictionaryAsync(x => x.BranchId, x => x.Count);
     }
 
+    public async Task<(IEnumerable<Employee> Items, int TotalCount)> SearchEmployeesPagedAsync(string? searchTerm, int pageNumber, int pageSize)
+    {
+        var query = _context.Employees.Include(e => e.EmployeeBranch).AsQueryable();
 
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(e =>
+                e.EmployeeId.ToString().Equals(searchTerm) ||
+                e.EmployeeId.ToString().Contains(searchTerm) ||
+                (e.EmployeeFirstName != null && e.EmployeeFirstName.Contains(searchTerm)) ||
+                (e.EmployeeLastName != null && e.EmployeeLastName.Contains(searchTerm)) ||
+                (e.EmployeeFirstName + " " + e.EmployeeLastName).Contains(searchTerm) ||
+                (e.EmployeeBranch != null && e.EmployeeBranch.BranchName != null && e.EmployeeBranch.BranchName.Contains(searchTerm)));
+        }
+
+        query = query.OrderBy(e => e.EmployeeLastName).ThenBy(e => e.EmployeeFirstName);
+
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
 }

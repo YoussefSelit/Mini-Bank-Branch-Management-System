@@ -11,5 +11,5 @@ public interface IEmployeeRepository : IExtendedRepository<Employee>
 
     Task<Dictionary<int, int>> GetEmployeeCountsByBranchAsync();
 
-
+    Task<(IEnumerable<Employee> Items, int TotalCount)> SearchEmployeesPagedAsync(string? searchTerm, int pageNumber, int pageSize);
 }

@@ -628,5 +628,22 @@ namespace BankBranchManagementSystem.Services
             EmployeeBranchStatus = e.EmployeeBranch?.BranchStatus,
             EmployeeBranchManagerId = e.EmployeeBranch?.BranchManager
         };
+
+        public async Task<PagedResult<EmployeeListDto>> GetEmployeesPagedAsync(int pageNumber, int pageSize, string? searchTerm = null)
+        {
+            pageNumber = Math.Max(pageNumber, 1);
+            pageSize = pageSize <= 0 ? 10 : pageSize;
+
+            var (employees, totalCount) = await employeeRepository.SearchEmployeesPagedAsync(searchTerm, pageNumber, pageSize);
+
+            return new PagedResult<EmployeeListDto>
+            {
+                Items = employees.Select(MapToListDto).ToList(),
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                SearchTerm = searchTerm
+            };
+        }
     }
 }

@@ -81,5 +81,39 @@ public class BranchRepository : ExtendedRepository<Branch>, IBranchRepository
             .FirstOrDefaultAsync(b => b.BranchManager == managerId);
     }
 
+    public async Task<(IEnumerable<Branch> Items, int TotalCount)> GetAllPagedAsync(int pageNumber, int pageSize)
+    {
+        var query = _context.Branches.AsNoTracking().OrderBy(b => b.BranchName);
 
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+
+    public async Task<(IEnumerable<Branch> Items, int TotalCount)> SearchBranchesPagedAsync(string? searchTerm, int pageNumber, int pageSize)
+    {
+        var query = _context.Branches.AsNoTracking().AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(b =>
+                (b.BranchCode != null && b.BranchCode.Contains(searchTerm)) ||
+                (b.BranchName != null && b.BranchName.Contains(searchTerm)) ||
+                (b.BranchCity != null && b.BranchCity.Contains(searchTerm)));
+        }
+
+        query = query.OrderBy(b => b.BranchName);
+
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
 }

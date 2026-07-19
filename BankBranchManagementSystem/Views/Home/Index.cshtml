@@ -1,9 +1,22 @@
 ﻿@model BankBranchManagementSystem.ViewModels.DashboardViewModel
+@using BankBranchManagementSystem.Constants
+
 @{
     ViewData["Title"] = "Dashboard";
 }
 
 <h1 class="mb-4">Dashboard</h1>
+
+@if (User.IsInRole(RoleNames.Admin))
+{
+    <div class="mb-4">
+        <a asp-controller="User"
+           asp-action="CreateAdmin"
+           class="btn btn-danger">
+            <i class="bi bi-person-plus-fill"></i> Add Admin
+        </a>
+    </div>
+}
 
 <div class="row mb-4">
     <div class="col-md-4">

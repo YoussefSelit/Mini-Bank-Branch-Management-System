@@ -59,5 +59,7 @@ namespace BankBranchManagementSystem.Interfaces
         Task<int> GetTotalEmployeesAsync();
 
         Task<Dictionary<int, int>> GetEmployeeCountsByBranchAsync();
+
+        Task<PagedResult<EmployeeListDto>> GetEmployeesPagedAsync(int pageNumber, int pageSize, string? searchTerm = null);
     }
 }

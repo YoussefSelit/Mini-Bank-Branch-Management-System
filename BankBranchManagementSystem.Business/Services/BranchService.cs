@@ -305,5 +305,27 @@ namespace BankBranchManagementSystem.Services
 
             };
         }
+
+        public async Task<PagedResult<BranchListDto>> GetBranchesPagedAsync(int pageNumber, int pageSize, string? searchTerm = null)
+        {
+            pageNumber = Math.Max(pageNumber, 1);
+            pageSize = pageSize <= 0 ? 10 : pageSize;
+
+            var (branches, totalCount) = string.IsNullOrWhiteSpace(searchTerm)
+                ? await branchRepository.GetAllPagedAsync(pageNumber, pageSize)
+                : await branchRepository.SearchBranchesPagedAsync(searchTerm, pageNumber, pageSize);
+
+            var employees = await employeeRepository.GetAllAsync();
+            var managerNames = employees.ToDictionary(e => e.EmployeeId, e => $"{e.EmployeeFirstName} {e.EmployeeLastName}");
+
+            return new PagedResult<BranchListDto>
+            {
+                Items = branches.Select(b => MapToListDto(b, managerNames)).ToList(),
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                SearchTerm = searchTerm
+            };
+        }
     }
 }
