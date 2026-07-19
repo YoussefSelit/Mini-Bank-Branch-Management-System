@@ -22,8 +22,9 @@ namespace BankBranchManagementSystem.Interfaces
         //Task<User> CreateUserAccountAsync(int adminId, int employeeId, string username, string initialPassword, int roleId);
 
         Task CreateBranchManagerAccountAsync(Employee employee);
-    
-    
+
+        Task<UserDto> CreateAdminAccountAsync(int requestingAdminId, CreateAdminDto dto);
+        
         //Removed the CreateUserAccountAsync, GetAllUsersAsync and DeleteUserAsync
     }
 }

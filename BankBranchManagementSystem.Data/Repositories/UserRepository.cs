@@ -75,6 +75,15 @@ namespace BankBranchManagementSystem.Repositories
 
         }
 
+
+        public async Task<List<string>> GetUsernamesByPrefixAsync(string prefix)
+        {
+            return await _context.Users
+                .Where(u => u.UserUsername != null && u.UserUsername.StartsWith(prefix))
+                .Select(u => u.UserUsername!)
+                .ToListAsync();
+        }
+
         public void Delete(User user)
         {
             _context.Users.Remove(user);
